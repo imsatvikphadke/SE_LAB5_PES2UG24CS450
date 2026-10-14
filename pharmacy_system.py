@@ -1,6 +1,3 @@
-
-"""Pharmacy prescription and stock tracking system."""
-
 import json
 import sqlite3
 from datetime import datetime
@@ -11,7 +8,6 @@ prescriptions = []
 
 
 def setup_database():
-    """Create the patient table and insert sample records."""
     cursor = conn.cursor()
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS patients "
@@ -30,14 +26,12 @@ def setup_database():
 
 
 def find_patient(name):
-    """Find a patient by name and return their ID and allergy."""
     cursor = conn.cursor()
     query = "SELECT id, allergy FROM patients WHERE name = ?"
     return cursor.execute(query, (name,)).fetchall()
 
 
 def add_stock(drug, units, expiry, batch_log=None):
-    """Add drug units to stock and record the batch."""
     if units < 0:
         raise ValueError("Stock units cannot be negative.")
 
@@ -54,7 +48,6 @@ def add_stock(drug, units, expiry, batch_log=None):
 
 
 def dispense(patient_name, drug, units):
-    """Dispense medicine if the patient is eligible and stock is sufficient."""
     patients = find_patient(patient_name)
     if not patients or units <= 0:
         return False
@@ -87,7 +80,6 @@ def dispense(patient_name, drug, units):
 
 
 def expiring_soon(days=30):
-    """Return drugs expiring within the specified number of days."""
     soon = []
 
     for drug, details in stock.items():
@@ -99,13 +91,11 @@ def expiring_soon(days=30):
 
 
 def export_prescriptions(file="prescriptions.json"):
-    """Export prescription records to a JSON file."""
     with open(file, "w", encoding="utf-8") as prescription_file:
         json.dump(prescriptions, prescription_file, indent=2)
 
 
 def load_stock(file="stock.json"):
-    """Load stock data from a JSON file when available."""
     try:
         with open(file, "r", encoding="utf-8") as stock_file:
             loaded_stock = json.load(stock_file)
@@ -127,7 +117,6 @@ def load_stock(file="stock.json"):
 
 
 def print_stock():
-    """Display all medicines currently in stock."""
     print("Pharmacy Stock")
 
     for drug, details in stock.items():
@@ -141,7 +130,6 @@ def print_stock():
 
 
 def main():
-    """Run the pharmacy stock and prescription demonstration."""
     setup_database()
     load_stock()
 
