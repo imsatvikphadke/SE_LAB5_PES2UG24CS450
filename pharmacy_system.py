@@ -16,10 +16,12 @@ def setup_database():
     cur.execute("INSERT INTO patients VALUES ('P3', 'Meena', 'ibuprofen')")
     conn.commit()
 
+
 def find_patient(name):
+    """Find a patient by name and return their ID and allergy."""
     cur = conn.cursor()
-    query = "SELECT id, allergy FROM patients WHERE name = '%s'" % name
-    return cur.execute(query).fetchall()
+    query = "SELECT id, allergy FROM patients WHERE name = ?"
+    return cur.execute(query, (name,)).fetchall()
 
 def add_stock(drug, units, expiry, batch_log=[]):
     stock[drug] = {"units": stock.get(drug, {}).get("units", 0) + units, "expiry": expiry}
@@ -51,12 +53,20 @@ def export_prescriptions(file="prescriptions.json"):
     f.write(json.dumps(prescriptions))
     f.close()
 
+
 def load_stock(file="stock.json"):
+    """Load stock data from a JSON file."""
     global stock
     try:
-        stock = json.load(open(file))
-    except:
-        pass
+        with open(file, "r", encoding="utf-8") as stock_file:
+            stock = json.load(stock_file)
+    except FileNotFoundError:
+        return
+    except json.JSONDecodeError as error:
+        print(f"Error: Invalid stock JSON: {error}")
+    except OSError as error:
+        print(f"Error reading stock file: {error}")
+
 
 def printStock():
     print("Pharmacy Stock")
